@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "ChatGPT anywhere",
+  "name": "YTGPT",
   "version": "1.0.1",
   "permissions": [
     "storage"
@@ -8,11 +8,14 @@
   "content_scripts": [
     {
       "matches": [
-        "*://*/*"
+        "https://*.youtube.com/*"
       ],
       "js": [
         "openai.js",
         "content-script.js"
+      ],
+      "css": [
+        "content.css"
       ]
     }
   ],
