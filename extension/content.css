@@ -1,0 +1,94 @@
+:root {
+  --color-btn-text: rgba(15, 15, 15);
+  --color-btn-background: rgba(0, 0, 0, 0.05);
+  --color-btn-background-hover: rgba(0, 0, 0, 0.1);
+  --color-btn-background-active: rgba(255, 255, 255, 0.15);
+  --color-modal-text: rgb(15, 15, 15);
+  --color-modal-background: rgb(255, 255, 255);
+  --color-modal-close-active: rgba(0, 0, 0, 0.15);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-btn-text: rgba(241, 241, 241);
+    --color-btn-background: rgba(255, 255, 255, 0.1);
+    --color-btn-background-hover: rgba(255, 255, 255, 0.2);
+    --color-btn-background-active: rgba(255, 255, 255, 0.3);
+    --color-modal-text: rgb(241, 241, 241);
+    --color-modal-background: rgb(33, 33, 33);
+    --color-modal-close-active: rgba(255, 255, 255, 0.15);
+  }
+}
+
+#summary-btn {
+  border: none;
+  border-radius: 30px;
+  margin-right: 8px;
+  font-family: 'Roboto', 'Arial', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0 16px;
+  color: var(--color-btn-text);
+  background-color: var(--color-btn-background);
+}
+
+#summary-btn:hover {
+  background-color: var(--color-btn-background-hover);
+}
+
+#summary-btn:active {
+  background-color: var(--color-btn-background-active);
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  margin: auto;
+  padding: 24px;
+  border-radius: 10px;
+  width: 50%;
+  height: 50%;
+  font-family: 'Roboto', 'Noto', sans-serif;
+  color: var(--color-modal-text);
+  background-color: var(--color-modal-background);
+}
+
+.close {
+  float: right;
+  font-size: 35px;
+  font-weight: 1;
+  line-height: 0.5;
+}
+
+.close:hover {
+  cursor: pointer;
+}
+
+.close:active {
+  border-radius: 10px;
+  background: var(--color-modal-close-active);
+}
+
+#modal-title {
+  font-size: 20px;
+}
+
+#modal-text {
+  width: 100%;
+  height: 89%;
+  margin-top: 20px;
+  font-size: 14px;
+  line-height: 1.4;
+  overflow: auto;
+}

@@ -629,10 +629,10 @@ to attach them to the start of each source file to most effectively
 state the exclusion of warranty; and each file should have at least
 the "copyright" line and a pointer to where the full notice is found.
 
-    ChatGPT Anywhere - A browser extension skeleton for
-    seamless ChatGPT integration, interacting directly with the ChatGPT browser
-    API and offering developers a cost-efficient solution by eliminating the
-    need for OpenAI's paid API calls.
+    YTGPT - A google chrome extension that leverages the power of `ChatGPT Anywhere`
+    to provide concise summaries of YouTube videos. Designed for users who want
+    to grasp the key points of lengthy videos without spending a lot of time,
+    YTGPT offers a convenient and efficient way to stay informed.
 
     Copyright (C) 2024  Akash Karnatak
 
