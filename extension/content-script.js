@@ -1,5 +1,3 @@
-let youtubeApiKey, transcript
-
 const $ = (x) => document.querySelector(x)
 
 const waitForSelector = async (selector) => {
@@ -58,21 +56,10 @@ const createPopup = () => {
   container.style.display = 'flex'
 }
 
-const getYoutubeApiKey = () => {
-  const scripts = document.getElementsByTagName('script')
-  const script = Array.from(scripts).find((x) =>
-    x.innerHTML.includes('INNERTUBE_API_KEY'),
-  )
-  youtubeApiKey = script.innerHTML
-    .match(/"INNERTUBE_API_KEY"\s*:\s*"([^']+?)"/)
-    .at(1)
-  console.log(youtubeApiKey)
-}
-
-const getVideoTranscript = async (lang) => {
-  lang = lang || 'en'
+const getVideoTranscript = async (videoId, lang = 'en') => {
   try {
-    const transcriptUrl = parseTranscriptEndpoint(lang)
+    const transcriptUrl = await parseTranscriptEndpoint(videoId, lang)
+    console.log(transcriptUrl)
 
     if (!transcriptUrl)
       throw new Error("Failed to locate a transcript for this video!");
@@ -94,10 +81,14 @@ const getVideoTranscript = async (lang) => {
   }
 }
 
-const parseTranscriptEndpoint = (langCode='en') => {
+const parseTranscriptEndpoint = async (videoId, langCode='en') => {
   try {
+    const res = await fetch(`https://www.youtube.com/watch?v=${videoId}`)
+    const text = await res.text()
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(text, 'text/html')
     // Get all script tags on document page
-    const scripts = document.getElementsByTagName("script");
+    const scripts = doc.getElementsByTagName("script");
 
     // find the player data script.
     const playerScript = Array.from(scripts).find((script) =>
@@ -141,11 +132,15 @@ const insertSummaryBtn = async () => {
   summaryBtn.id = 'summary-btn'
   summaryBtn.innerText = 'Summary'
   actionDiv.prepend(summaryBtn)
-  summaryBtn.onclick = () => {
+  summaryBtn.onclick = async () => {
     createPopup()
+    const videoId = new URL(document.location).searchParams.get('v')
+    const transcript = await getVideoTranscript(videoId)
+    console.log(transcript)
     if (!transcript) {
       const textAreaPara = $('#modal-text p')
       textAreaPara.innerText = 'Transcript not available for this video'
+      return
     }
     const conv = new OpenAIConversation({
       onMessage: (content) => {
@@ -174,8 +169,6 @@ const initialize = async () => {
   console.log('starting')
   await insertSummaryBtn()
   console.log('stopping')
-  transcript = await getVideoTranscript()
-  console.log(transcript)
 }
 
 ;(async () => {
