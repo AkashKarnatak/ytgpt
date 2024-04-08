@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "YTGPT",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "permissions": [
     "storage",
     "*://chat.openai.com/*"
