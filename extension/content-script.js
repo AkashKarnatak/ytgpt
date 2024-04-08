@@ -69,29 +69,64 @@ const getYoutubeApiKey = () => {
   console.log(youtubeApiKey)
 }
 
-const getVideoTranscript = async (videoId) => {
-  const res = await fetch(
-    'https://www.youtube.com/youtubei/v1/get_transcript?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        context: { client: { clientName: 'WEB', clientVersion: '2.9999099' } },
-        params: btoa(`\n\v${videoId}`),
-      }),
-    },
-  )
-  data = await res.json()
-  return data?.actions
-    ?.at(0)
-    ?.updateEngagementPanelAction?.content?.transcriptRenderer?.body?.transcriptBodyRenderer?.cueGroups?.map(
-      (x) =>
-        x.transcriptCueGroupRenderer.cues.at(0)?.transcriptCueRenderer?.cue
-          .simpleText,
-    )
-    ?.join(' ')
+const getVideoTranscript = async (lang) => {
+  lang = lang || 'en'
+  try {
+    const transcriptUrl = parseTranscriptEndpoint(lang)
+
+    if (!transcriptUrl)
+      throw new Error("Failed to locate a transcript for this video!");
+
+    const res = await fetch(transcriptUrl)
+    const xmlText = await res.text()
+    const parser = new DOMParser()
+    const xmlDoc = parser.parseFromString(xmlText, 'application/xml')
+
+    let transcript = "";
+    const chunks = xmlDoc.getElementsByTagName("text");
+    for (const chunk of chunks) {
+      transcript += chunk.textContent;
+    }
+
+    return transcript;
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const parseTranscriptEndpoint = (langCode='en') => {
+  try {
+    // Get all script tags on document page
+    const scripts = document.getElementsByTagName("script");
+
+    // find the player data script.
+    const playerScript = Array.from(scripts).find((script) =>
+      script.textContent.includes("var ytInitialPlayerResponse = {")
+    );
+
+    const dataString =
+      playerScript.textContent
+        ?.split("var ytInitialPlayerResponse = ")?.[1] //get the start of the object {....
+        ?.split("};")?.[0] + // chunk off any code after object closure.
+      "}"; // add back that curly brace we just cut.
+
+    const data = JSON.parse(dataString.trim()); // Attempt a JSON parse
+    const availableCaptions =
+      data?.captions?.playerCaptionsTracklistRenderer?.captionTracks || [];
+
+    // If languageCode was specified then search for it's code, otherwise get the first.
+    let captionTrack = availableCaptions?.[0];
+    if (langCode)
+      captionTrack =
+        availableCaptions.find((track) =>
+          track.languageCode.includes(langCode)
+        ) ?? availableCaptions?.[0];
+
+    return captionTrack?.baseUrl;
+  } catch (e) {
+    console.error(`[parseTranscriptEndpoint] ${e.message}`);
+    return null;
+  }
 }
 
 const insertSummaryBtn = async () => {
@@ -139,8 +174,7 @@ const initialize = async () => {
   console.log('starting')
   await insertSummaryBtn()
   console.log('stopping')
-  const videoId = new URL(document.location).searchParams.get('v')
-  transcript = await getVideoTranscript(videoId)
+  transcript = await getVideoTranscript()
   console.log(transcript)
 }
 
